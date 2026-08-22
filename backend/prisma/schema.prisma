@@ -1,0 +1,213 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ROLES {
+  TRAVELLER
+  BUSDRIVER
+  ADMIN
+}
+
+enum BUS_TYPE {
+  AC
+  NON_AC
+  SLEEPER
+  SEMI_SLEEPER
+}
+
+enum BOOKING_STATUS {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum PAYMENT_STATUS {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum SEAT_STATUS {
+  HELD
+  BOOKED
+  CANCELLED
+  EXPIRED
+}
+
+model User {
+  id        String @id @default(uuid()) @db.Uuid
+  firstName String
+  lastName  String
+  email     String @unique
+  password  String
+  role      ROLES  @default(TRAVELLER)
+
+  otp         Int?
+  verified_At DateTime?
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+
+  tourPlaces    Tourplace[]    @relation("AdminTourPlaces")
+  buses         Bus[]          @relation("DriverBus")
+  tourBookings  TourBooking[]  @relation("TravellerTourBookings")
+  busBookings   BusBooking[]   @relation("TravellerBusBookings")
+  hotelBookings HotelBooking[] @relation("TravellerHotelBookings")
+}
+
+model Tourplace {
+  id   String @id @default(uuid()) @db.Uuid
+  name String
+
+  adminId String @db.Uuid
+  admin   User   @relation("AdminTourPlaces", fields: [adminId], references: [id])
+
+  tourBookings TourBooking[]
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+}
+
+model TourBooking {
+  id String @id @default(uuid()) @db.Uuid
+
+  travellerId String @db.Uuid
+  traveller   User   @relation("TravellerTourBookings", fields: [travellerId], references: [id])
+
+  tourPlaceId String    @db.Uuid
+  tourPlace   Tourplace @relation(fields: [tourPlaceId], references: [id])
+
+  hotelBooking HotelBooking?
+  busBookings  BusBooking[]
+
+  status BOOKING_STATUS @default(PENDING)
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+}
+
+model Bus {
+  id String @id @default(uuid()) @db.Uuid
+
+  busNumber  String   @unique
+  busType    BUS_TYPE
+  totalSeats Int
+
+  driverId String? @db.Uuid
+  driver   User?   @relation("DriverBus", fields: [driverId], references: [id])
+
+  from String
+  to   String
+
+  departureAt DateTime
+  arrivalAt   DateTime
+
+  bookings BusBooking[]
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+}
+
+model BusBooking {
+  id String @id @default(uuid()) @db.Uuid
+
+  travellerId String @db.Uuid
+  traveller User @relation(
+    "TravellerBusBookings",
+    fields: [travellerId],
+    references: [id]
+  )
+
+  busId String @db.Uuid
+  bus Bus @relation(
+    fields: [busId],
+    references: [id]
+  )
+
+  tourBookingId String @db.Uuid
+  tourBooking TourBooking @relation(
+    fields: [tourBookingId],
+    references: [id]
+  )
+
+  seatNumber String
+
+  status SEAT_STATUS @default(HELD)
+
+  holdUntil DateTime?
+
+  paymentStatus PAYMENT_STATUS @default(PENDING)
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+
+  @@unique([busId, seatNumber])
+}
+
+model Hotel {
+  id String @id @default(uuid()) @db.Uuid
+
+  name        String
+  address     String
+  description String?
+
+  latitude  Decimal? @db.Decimal(10, 7)
+  longitude Decimal? @db.Decimal(10, 7)
+
+  rooms HotelRoom[]
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+}
+
+model HotelRoom {
+  id String @id @default(uuid()) @db.Uuid
+
+  hotelId String @db.Uuid
+  hotel   Hotel  @relation(fields: [hotelId], references: [id])
+
+  roomNumber String
+  roomType   String
+
+  pricePerNight Decimal @db.Decimal(10, 2)
+
+  bookings HotelBooking[]
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+
+  @@unique([hotelId, roomNumber])
+}
+
+model HotelBooking {
+  id String @id @default(uuid()) @db.Uuid
+
+  travellerId String @db.Uuid
+  traveller   User   @relation("TravellerHotelBookings", fields: [travellerId], references: [id])
+
+  tourBookingId String      @unique @db.Uuid
+  tourBooking   TourBooking @relation(fields: [tourBookingId], references: [id])
+
+  roomId String    @db.Uuid
+  room   HotelRoom @relation(fields: [roomId], references: [id])
+
+  checkIn        DateTime
+  checkOut       DateTime
+  numberOfGuests Int
+  totalAmount    Decimal  @db.Decimal(10, 2)
+
+  status        BOOKING_STATUS @default(PENDING)
+  paymentStatus PAYMENT_STATUS @default(PENDING)
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+}
