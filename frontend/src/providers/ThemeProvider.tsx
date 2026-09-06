@@ -1,10 +1,5 @@
-import React, { useState } from "react";
-
 const ThemeProvider = () => {
-  const [theme, setTheme] = useState(true);
-  return <>
-  
-  </>;
+  return null;
 };
 
 export default ThemeProvider;
