@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomeDasboard from "@/page/homePages/dashbord";
+import HomePage from "@/features/home/pages/HomePage";
 import UserDashboard from "@/page/user/userDashboard";
 
 const Allroute = () => {
@@ -7,7 +7,7 @@ const Allroute = () => {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomeDasboard />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/user/dashboard" element={<UserDashboard />} />
         </Routes>
       </BrowserRouter>
