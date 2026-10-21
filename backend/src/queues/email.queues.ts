@@ -1,10 +1,37 @@
-import { Queue } from 'bullmq';
+import { Queue, type JobsOptions } from "bullmq";
+import { connection } from "../config/redisConnection.js";
+import {
+  EMAIL_QUEUE_NAME,
+  SEND_VERIFICATION_EMAIL_JOB,
+  type SendVerificationEmailJobData,
+  type SendVerificationEmailJobName,
+  type SendVerificationEmailJobResult,
+} from "./emailQueue.types.js";
 
-const myQueue = new Queue('foo');
+const defaultEmailJobOptions: JobsOptions = {
+  attempts: 3,
+  backoff: {
+    type: "exponential",
+    delay: 5_000,
+  },
+  removeOnComplete: true,
+  removeOnFail: 1_000,
+};
 
-async function addJobs() {
-  await myQueue.add('myJobName', { foo: 'bar' });
-  await myQueue.add('myJobName', { qux: 'baz' });
-}
+export const emailQueue = new Queue<
+  SendVerificationEmailJobData,
+  SendVerificationEmailJobResult,
+  SendVerificationEmailJobName
+>(EMAIL_QUEUE_NAME, {
+  connection,
+  defaultJobOptions: defaultEmailJobOptions,
+});
 
-await addJobs();
+export const addVerificationEmailJob = async (
+  data: SendVerificationEmailJobData,
+  options: JobsOptions = {},
+) =>
+  emailQueue.add(SEND_VERIFICATION_EMAIL_JOB, data, {
+    ...defaultEmailJobOptions,
+    ...options,
+  });

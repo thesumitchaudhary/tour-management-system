@@ -51,8 +51,9 @@ model User {
   password  String
   role      ROLES  @default(TRAVELLER)
 
-  otp         Int?
-  verified_At DateTime?
+  otp          String?
+  otpExpiresAt DateTime?
+  verified_At  DateTime?
 
   created_At DateTime @default(now())
   updated_At DateTime @updatedAt
@@ -121,23 +122,13 @@ model BusBooking {
   id String @id @default(uuid()) @db.Uuid
 
   travellerId String @db.Uuid
-  traveller User @relation(
-    "TravellerBusBookings",
-    fields: [travellerId],
-    references: [id]
-  )
+  traveller   User   @relation("TravellerBusBookings", fields: [travellerId], references: [id])
 
   busId String @db.Uuid
-  bus Bus @relation(
-    fields: [busId],
-    references: [id]
-  )
+  bus   Bus    @relation(fields: [busId], references: [id])
 
-  tourBookingId String @db.Uuid
-  tourBooking TourBooking @relation(
-    fields: [tourBookingId],
-    references: [id]
-  )
+  tourBookingId String      @db.Uuid
+  tourBooking   TourBooking @relation(fields: [tourBookingId], references: [id])
 
   seatNumber String
 

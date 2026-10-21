@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "otpExpiresAt" TIMESTAMP(3),
+ALTER COLUMN "otp" SET DATA TYPE TEXT;

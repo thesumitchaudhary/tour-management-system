@@ -1,9 +1,12 @@
 import express from "express";
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import { randomInt } from "node:crypto";
+import { ROLES } from "../generated/prisma/enums.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { prisma } from "../libs/Prisma.js";
+import { addVerificationEmailJob } from "../queues/email.queues.js";
 import type { UserModel } from "../generated/prisma/models/User.js";
 import { sendError, sendSuccess } from "../utils/apiTypes.js";
 import type { ApiResponse, EmptyParams } from "../utils/apiTypes.js";
@@ -26,6 +29,7 @@ type RegisterRequestBody = {
 };
 
 type VerifyOtpRequestBody = {
+  email?: unknown;
   code?: unknown;
 };
 
@@ -38,9 +42,27 @@ type LoginResponseData = {
   token: string;
 };
 
+type UserResponse = {
+  id: string;
+  adminName: string;
+  email: string;
+};
+
+type PublicUser = Pick<
+  UserModel,
+  | "id"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "role"
+  | "verified_At"
+  | "created_At"
+  | "updated_At"
+>;
+
 type HealthCheckResponse = string;
-type RegisterResponse = ApiResponse<UserModel>;
-type VerifyOtpResponse = ApiResponse<null>;
+type RegisterResponse = ApiResponse<PublicUser>;
+type VerifyOtpResponse = ApiResponse<PublicUser>;
 type LoginResponse = ApiResponse<LoginResponseData>;
 type LogoutResponse =
   | {
@@ -63,6 +85,17 @@ const toRequiredString = (value: unknown): string | null => {
 const isRequiredPassword = (value: unknown): value is string =>
   typeof value === "string" && value.length > 0;
 
+const createUserResponse = (user: UserModel): PublicUser => ({
+  id: user.id,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  email: user.email,
+  role: user.role,
+  verified_At: user.verified_At,
+  created_At: user.created_At,
+  updated_At: user.updated_At,
+});
+
 router.get<EmptyParams, HealthCheckResponse>(
   "/",
   (
@@ -81,7 +114,7 @@ router.post<EmptyParams, RegisterResponse, RegisterRequestBody>(
   ): Promise<void> => {
     try {
       const fullName = toRequiredString(req.body.fullName);
-      const email = toRequiredString(req.body.email);
+      const email = toRequiredString(req.body.email)?.toLowerCase() ?? null;
       const { password, confirmedPassword } = req.body;
 
       if (
@@ -110,7 +143,7 @@ router.post<EmptyParams, RegisterResponse, RegisterRequestBody>(
         return;
       }
 
-      const generatedOtp = Math.floor(100000 + Math.random() * 900000);
+      const generatedOtp = randomInt(100000, 1000000).toString();
 
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
@@ -127,7 +160,23 @@ router.post<EmptyParams, RegisterResponse, RegisterRequestBody>(
           email,
           password: hash,
           otp: generatedOtp,
+          otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
         },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          role: true,
+          verified_At: true,
+          created_At: true,
+          updated_At: true,
+        },
+      });
+
+      await addVerificationEmailJob({
+        email: user.email,
+        otp: generatedOtp,
       });
 
       const token = jwt.sign(
@@ -163,19 +212,57 @@ router.post<EmptyParams, RegisterResponse, RegisterRequestBody>(
 
 router.post<EmptyParams, VerifyOtpResponse, VerifyOtpRequestBody>(
   "/verifyOtp",
-  (
+  async (
     req: Request<EmptyParams, VerifyOtpResponse, VerifyOtpRequestBody>,
     res: Response<VerifyOtpResponse>,
-  ): void => {
+  ): Promise<void> => {
     try {
+      const email = toRequiredString(req.body.email)?.toLowerCase() ?? null;
       const code = toRequiredString(req.body.code);
 
-      if (!code) {
-        sendError(res, 400, "OTP code is mandatory");
+      if (!email || !code) {
+        sendError(res, 400, "Email and OTP are mandatory");
         return;
       }
 
-      sendError(res, 501, "OTP verification is not implemented yet");
+      const user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      if (!user || user.role !== ROLES.TRAVELLER) {
+        sendError(res, 404, "User is not found");
+        return;
+      }
+
+      if (user.otp !== code) {
+        sendError(res, 401, "Invalid OTP");
+        return;
+      }
+
+      if (!user.otpExpiresAt || user.otpExpiresAt <= new Date()) {
+        sendError(res, 410, "OTP expired");
+        return;
+      }
+
+      const verifiedUser = await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          otp: null,
+          otpExpiresAt: null,
+          verified_At: new Date(),
+        },
+      });
+
+      sendSuccess(
+        res,
+        200,
+        "OTP verification successfully",
+        createUserResponse(verifiedUser),
+      );  
     } catch (error) {
       if (error instanceof Error) {
         sendError(res, 500, error.message);
@@ -194,7 +281,7 @@ router.post<EmptyParams, LoginResponse, LoginRequestBody>(
     res: Response<LoginResponse>,
   ): Promise<void> => {
     try {
-      const email = toRequiredString(req.body.email);
+      const email = toRequiredString(req.body.email)?.toLowerCase() ?? null;
       const { password } = req.body;
 
       if (!email || !isRequiredPassword(password)) {

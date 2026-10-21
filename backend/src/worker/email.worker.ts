@@ -1,22 +1,56 @@
-import { Worker } from 'bullmq';
-import IORedis from 'ioredis';
+import { Worker } from "bullmq";
+import { connection } from "../config/redisConnection.js";
+import { sendVerificationCode } from "../helper/sendVerificationCode.js";
+import {
+  EMAIL_QUEUE_NAME,
+  SEND_VERIFICATION_EMAIL_JOB,
+  type SendVerificationEmailJobData,
+  type SendVerificationEmailJobName,
+  type SendVerificationEmailJobResult,
+} from "../queues/emailQueue.types.js";
 
-const connection = new IORedis({ maxRetriesPerRequest: null });
+const parseWorkerConcurrency = (): number => {
+  const concurrency = Number.parseInt(
+    process.env.EMAIL_WORKER_CONCURRENCY ?? "5",
+    10,
+  );
 
-const worker = new Worker(
-  'foo',
-  async job => {
-    // Will print { foo: 'bar'} for the first job
-    // and { qux: 'baz' } for the second.
-    console.log(job.data);
+  if (!Number.isInteger(concurrency) || concurrency <= 0) {
+    throw new Error("EMAIL_WORKER_CONCURRENCY must be a positive integer");
+  }
+
+  return concurrency;
+};
+
+export const emailWorker = new Worker<
+  SendVerificationEmailJobData,
+  SendVerificationEmailJobResult,
+  SendVerificationEmailJobName
+>(
+  EMAIL_QUEUE_NAME,
+  async (job) => {
+    if (job.name !== SEND_VERIFICATION_EMAIL_JOB) {
+      throw new Error(`Unsupported email job: ${job.name}`);
+    }
+
+    const messageId = await sendVerificationCode(job.data.email, job.data.otp);
+
+    return { messageId };
   },
-  { connection },
+  {
+    connection,
+    concurrency: parseWorkerConcurrency(),
+  },
 );
 
-worker.on('completed', job => {
-  console.log(`${job.id} has completed!`);
+emailWorker.on("completed", (job) => {
+  console.log(`Email job ${job.id} (${job.name}) has completed`);
 });
 
-worker.on('failed', (job, err) => {
-  console.log(`${job.id} has failed with ${err.message}`);
+emailWorker.on("failed", (job, err) => {
+  console.error(`Email job ${job?.id ?? "unknown"} failed: ${err.message}`);
+});
+
+emailWorker.on("error", (err) => {
+  console.error("Email worker error:", err.message);
 });

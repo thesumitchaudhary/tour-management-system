@@ -1,6 +1,5 @@
-import Redis from "ioredis";
-import type { RedisOptions } from "ioredis";
-import "./env";
+import { Redis, type RedisOptions } from "ioredis";
+import "dotenv/config";
 
 type BullRedisOptions = Omit<RedisOptions, "replyMapping">;
 

@@ -5,7 +5,8 @@
   "main": "src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch --inspect src/app.ts"
+    "dev": "tsx watch --inspect src/app.ts",
+    "dev:worker": "tsx watch src/worker/email.worker.ts"
   },
   "type": "module",
   "keywords": [],
