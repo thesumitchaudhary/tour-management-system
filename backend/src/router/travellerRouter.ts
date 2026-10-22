@@ -22,7 +22,8 @@ if (!JWT_SECRET) {
 }
 
 type RegisterRequestBody = {
-  fullName?: unknown;
+  firstName?: unknown;
+  lastName?: unknown;
   email?: unknown;
   password?: unknown;
   confirmedPassword?: unknown;
@@ -113,12 +114,14 @@ router.post<EmptyParams, RegisterResponse, RegisterRequestBody>(
     res: Response<RegisterResponse>,
   ): Promise<void> => {
     try {
-      const fullName = toRequiredString(req.body.fullName);
+      const firstName = toRequiredString(req.body.firstName);
+      const lastName = toRequiredString(req.body.lastName);
       const email = toRequiredString(req.body.email)?.toLowerCase() ?? null;
       const { password, confirmedPassword } = req.body;
 
       if (
-        !fullName ||
+        !firstName ||
+        !lastName ||
         !email ||
         !isRequiredPassword(password) ||
         !isRequiredPassword(confirmedPassword)
@@ -147,11 +150,6 @@ router.post<EmptyParams, RegisterResponse, RegisterRequestBody>(
 
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
-      const [firstName, ...lastNameParts] = fullName.split(/\s+/) as [
-        string,
-        ...string[],
-      ];
-      const lastName = lastNameParts.join(" ");
 
       const user = await prisma.user.create({
         data: {

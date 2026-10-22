@@ -5,7 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 const fieldClassName =
   "h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/30";
 
-const SignupForm = () => {
+const SignupForm = ({ onRegistered }: { onRegistered: (email: string) => void }) => {
   const { submit, isPending, error, message } = useAuth();
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,26 +18,45 @@ const SignupForm = () => {
         return Promise.resolve({ success: false, message: "Passwords do not match" });
       }
       return signUp({
-        fullName: String(data.get("fullName")).trim(),
+        firstName: String(data.get("firstName")).trim(),
+        lastName: String(data.get("lastName")).trim(),
         email: String(data.get("email")).trim(),
         password,
         confirmedPassword,
       });
-    }, () => form.reset());
+    }, () => {
+      onRegistered(String(data.get("email")).trim());
+      form.reset();
+    });
   };
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <label className="text-sm font-medium" htmlFor="signup-name">
-          Full Name
+          First Name
         </label>
         <input
           id="signup-name"
-          name="fullName"
+          name="firstName"
           className={fieldClassName}
           type="text"
-          placeholder="Enter your name"
+          placeholder="Enter your first name"
+          autoComplete="name"
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium" htmlFor="signup-name">
+          Last Name
+        </label>
+        <input
+          id="signup-name"
+          name="lastName"
+          className={fieldClassName}
+          type="text"
+          placeholder="Enter your last name"
           autoComplete="name"
           required
         />
@@ -88,7 +107,7 @@ const SignupForm = () => {
         />
       </div>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      {message && <p role="status" className="text-sm">{message} You can now sign in.</p>}
+      {message && <p role="status" className="text-sm">{message}</p>}
       <button
         disabled={isPending}
         type="submit"

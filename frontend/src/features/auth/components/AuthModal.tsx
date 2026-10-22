@@ -2,6 +2,7 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { X } from "lucide-react";
 import SigninForm from "./SigninForm";
 import SignupForm from "./SignupForm";
+import VerifyOtpForm from "./VerifyOtpForm";
 import type { AuthMode } from "../types/auth.types";
 
 type AuthModalProps = {
@@ -11,6 +12,20 @@ type AuthModalProps = {
 
 const AuthModal = ({ defaultMode = "signin", onClose }: AuthModalProps) => {
   const [mode, setMode] = useState<AuthMode>(defaultMode);
+  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousRootOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousRootOverflow;
+    };
+  }, []);
 
   useEffect(() => {
     if (!onClose) return;
@@ -42,14 +57,16 @@ const AuthModal = ({ defaultMode = "signin", onClose }: AuthModalProps) => {
       aria-labelledby="auth-modal-title"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-xl">
+      <div className="max-h-full w-full max-w-md overflow-y-auto overscroll-contain rounded-lg border border-border bg-background p-6 shadow-xl">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <h2 id="auth-modal-title" className="text-xl font-semibold">
-              {mode === "signup" ? "Create account" : "Welcome back"}
+              {verificationEmail ? "Verify your email" : mode === "signup" ? "Create account" : "Welcome back"}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {mode === "signup"
+              {verificationEmail
+                ? "Confirm your email to complete registration."
+                : mode === "signup"
                 ? "Start planning your next trip with Wanderlust."
                 : "Sign in to continue planning your trips."}
             </p>
@@ -67,7 +84,7 @@ const AuthModal = ({ defaultMode = "signin", onClose }: AuthModalProps) => {
           ) : null}
         </div>
 
-        <div className="mb-5 grid grid-cols-2 rounded-lg bg-muted p-1">
+        {!verificationEmail && <div className="mb-5 grid grid-cols-2 rounded-lg bg-muted p-1">
           <button
             type="button"
             className={`rounded-md px-3 py-2 text-sm font-medium transition ${
@@ -90,9 +107,14 @@ const AuthModal = ({ defaultMode = "signin", onClose }: AuthModalProps) => {
           >
             Sign Up
           </button>
-        </div>
+        </div>}
 
-        {mode === "signup" ? <SignupForm /> : <SigninForm />}
+        {verificationEmail ? (
+          <VerifyOtpForm email={verificationEmail} onContinue={() => {
+            setVerificationEmail(null);
+            setMode("signin");
+          }} />
+        ) : mode === "signup" ? <SignupForm onRegistered={setVerificationEmail} /> : <SigninForm />}
       </div>
     </div>
   );

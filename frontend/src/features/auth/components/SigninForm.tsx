@@ -50,6 +50,10 @@ const SigninForm = () => {
         />
       </div>
 
+      <div>
+        <a href="" className="text-blue-600 text-sm">forgot password</a>
+      </div>
+
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       {message && <p role="status" className="text-sm">{message}</p>}
       <button
