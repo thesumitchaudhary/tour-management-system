@@ -24,7 +24,7 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "Wanderlust",
       logo: (
         <GalleryVerticalEndIcon
         />
