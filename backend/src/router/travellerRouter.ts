@@ -358,4 +358,55 @@ router.get<EmptyParams, LogoutResponse>(
   },
 );
 
+// Resolve the account from the signed session rather than a client-supplied ID.
+router.use("/profile", async (req, res, next) => {
+  try {
+    const token = req.cookies?.token;
+    if (typeof token !== "string" || !token) {
+      res.status(401).json({ success: false, message: "Please sign in." });
+      return;
+    }
+    const payload = jwt.verify(token, JWT_SECRET);
+    if (typeof payload === "string" || typeof payload.id !== "string") {
+      res.status(401).json({ success: false, message: "Please sign in." });
+      return;
+    }
+    res.locals.userId = payload.id;
+    next();
+  } catch {
+    res.status(401).json({ success: false, message: "Your session expired. Please sign in." });
+  }
+});
+
+router.get("/profile", async (_req, res) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: res.locals.userId } });
+    if (!user) {
+      res.status(401).json({ success: false, message: "Please sign in." });
+      return;
+    }
+    sendSuccess(res, 200, "Profile loaded", createUserResponse(user));
+  } catch {
+    sendError(res, 500, "Unable to load profile. Please try again.");
+  }
+});
+
+router.put("/profile", async (req, res) => {
+  const firstName = toRequiredString(req.body.firstName);
+  const lastName = toRequiredString(req.body.lastName);
+  if (!firstName || !lastName || firstName.length > 100 || lastName.length > 100) {
+    sendError(res, 400, "First and last names must contain 1–100 characters.");
+    return;
+  }
+  try {
+    const user = await prisma.user.update({
+      where: { id: res.locals.userId },
+      data: { firstName, lastName },
+    });
+    sendSuccess(res, 200, "Profile updated successfully", createUserResponse(user));
+  } catch {
+    sendError(res, 500, "Unable to save profile. Please try again.");
+  }
+});
+
 export default router;

@@ -1,12 +1,13 @@
 import { type FormEvent } from "react";
 import { signUp } from "../api/auth.api";
 import { useAuth } from "../hooks/useAuth";
+import GlobeLoader from "@/components/GlobeLoader";
 
 const fieldClassName =
   "h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/30";
 
 const SignupForm = ({ onRegistered }: { onRegistered: (email: string) => void }) => {
-  const { submit, isPending, error, message } = useAuth();
+  const { submit, isPending, error, message, progress } = useAuth({ showProgress: true });
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -32,6 +33,7 @@ const SignupForm = ({ onRegistered }: { onRegistered: (email: string) => void })
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      {isPending && <GlobeLoader progress={progress} label="Creating account" />}
       <div className="space-y-2">
         <label className="text-sm font-medium" htmlFor="signup-name">
           First Name

@@ -2,24 +2,26 @@ import { type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { signIn } from "../api/auth.api";
 import { useAuth } from "../hooks/useAuth";
+import GlobeLoader from "@/components/GlobeLoader";
 
 const fieldClassName =
   "h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/30";
 
-const SigninForm = () => {
+const SigninForm = ({ onSuccess }: { onSuccess?: () => void } = {}) => {
   const navigate = useNavigate();
-  const { submit, isPending, error, message } = useAuth();
+  const { submit, isPending, error, message, progress } = useAuth({ showProgress: true });
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     void submit(() => signIn({
       email: String(data.get("email")).trim(),
       password: String(data.get("password")),
-    }), () => navigate("/user/dashboard"));
+    }), () => onSuccess ? onSuccess() : navigate("/user/dashboard"));
   };
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      {isPending && <GlobeLoader progress={progress} label="Signing in" />}
       <div className="space-y-2">
         <label className="text-sm font-medium" htmlFor="signin-email">
           Email

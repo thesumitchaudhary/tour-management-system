@@ -1,0 +1,26 @@
+.globe-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: #f5f6f8;
+  pointer-events: auto;
+}
+.globe-loader { display: grid; justify-items: center; gap: 18px; font-family: Arial, sans-serif; }
+.globe-loader-icon {
+  width: 76px; height: 76px; display: grid; place-items: center;
+  border-radius: 16px; background: #1bc45b; box-shadow: 0 8px 24px #1bc45b30;
+  animation: globe-loader-pulse 1.4s ease-in-out infinite;
+}
+.globe-loader-globe { width: 46px; height: 46px; color: white; animation: globe-loader-rotate 3s linear infinite; }
+.globe-loader-percentage { color: #253146; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.globe-loader-track { width: 150px; height: 5px; overflow: hidden; border-radius: 10px; background: #dce4df; }
+.globe-loader-fill { height: 100%; border-radius: inherit; background: #1bc45b; transition: width 80ms linear; }
+.globe-loader-done .globe-loader-icon, .globe-loader-done .globe-loader-globe { animation: none; }
+@keyframes globe-loader-rotate { to { transform: rotate(360deg); } }
+@keyframes globe-loader-pulse { 50% { box-shadow: 0 0 0 12px #1bc45b12; } }
+@media (prefers-reduced-motion: reduce) {
+  .globe-loader-icon, .globe-loader-globe { animation: none; }
+  .globe-loader-fill { transition: none; }
+}
