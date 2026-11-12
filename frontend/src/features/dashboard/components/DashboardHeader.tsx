@@ -17,7 +17,7 @@ const DashboardHeader = ({ t }: { t: Translate }) => {
             <Link to={"/user/guide"}>{t("nav.travelGuides")}</Link>
           </li>
           <li>
-            <Link to={"/user/guide"}>{t("footer.links.hotel")}</Link>
+            <Link to={"/user/hotel"}>{t("footer.links.hotel")}</Link>
           </li>
           <li>{t("dashboard.deals")}</li>
         </ul>

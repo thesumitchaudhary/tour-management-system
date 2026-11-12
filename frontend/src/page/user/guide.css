@@ -1,0 +1,97 @@
+.guide-page {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.guide-main {
+  width: min(100%, 1200px);
+  margin-inline: auto;
+  padding: 48px 24px 72px;
+  flex: 1;
+}
+
+.guide-hero {
+  padding: 64px 24px;
+  border: 1px solid #dcebe7;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #f0f8f5, #f8faf5);
+  text-align: center;
+  color: #183d35;
+}
+
+.guide-hero h2 {
+  max-width: 650px;
+  margin: 0 auto 28px;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.guide-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 580px;
+  margin-inline: auto;
+  padding: 0 18px;
+  border: 1px solid #c8d9d2;
+  border-radius: 12px;
+  background: #fff;
+  color: #5c756c;
+  box-shadow: 0 6px 20px #183d3508;
+}
+
+.guide-search:focus-within {
+  outline: 3px solid #27836645;
+  border-color: #278366;
+}
+
+.guide-search input {
+  width: 100%;
+  min-width: 0;
+  padding-block: 17px;
+  background: transparent;
+  color: #183d35;
+  outline: none;
+}
+
+.guide-search input::placeholder { color: #687d75; }
+.guide-hero > p { margin: 24px 0 12px; color: #566e64; font-size: 14px; }
+.guide-destinations { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+.guide-destinations button {
+  padding: 8px 18px;
+  border: 1px solid #c8d9d2;
+  border-radius: 999px;
+  background: #ffffffb3;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 160ms, border-color 160ms;
+}
+
+.guide-destinations button:hover { background: #e0efe7; border-color: #8fb6a4; }
+.guide-destinations button:focus-visible { outline: 3px solid #278366; outline-offset: 3px; }
+.guide-recent { margin-top: 48px; }
+.guide-recent > h2 { margin-bottom: 22px; font-size: 26px; font-weight: 700; letter-spacing: -0.025em; }
+.guide-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.guide-card { overflow: hidden; border: 1px solid #dce5df; border-radius: 16px; background: #fff; color: #183d35; }
+.guide-card > img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+.guide-card-content { padding: 20px; }
+.guide-location { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; color: #60756a; font-size: 13px; }
+.guide-card h3 { font-size: 19px; font-weight: 650; line-height: 1.4; }
+
+@media (max-width: 800px) {
+  .guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 540px) {
+  .guide-main { padding: 24px 16px 40px; }
+  .guide-hero { padding: 40px 18px; border-radius: 18px; }
+  .guide-destinations { gap: 8px; }
+  .guide-destinations button { padding: 8px 12px; }
+  .guide-recent { margin-top: 32px; }
+  .guide-grid { grid-template-columns: 1fr; }
+}
