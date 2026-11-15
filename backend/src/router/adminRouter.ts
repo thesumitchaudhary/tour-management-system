@@ -39,57 +39,68 @@ router.get("/", (req: Request, res: Response) => {
   res.json({ success: true, message: "hey it's working" });
 });
 
-router.post<EmptyParams, AdminLoginResponse, AdminLoginBody>("/login", async (req, res) => {
-  try {
-    const email = toRequiredString(req.body?.email)?.toLowerCase() ?? null;
-    const password = req.body?.password;
+router.post<EmptyParams, AdminLoginResponse, AdminLoginBody>(
+  "/login",
+  async (req, res) => {
+    try {
+      const email = toRequiredString(req.body?.email)?.toLowerCase() ?? null;
+      const password = req.body?.password;
 
-    if (!email || !isRequiredPassword(password)) {
-      sendError(res, 400, "Email and password are mandatory");
-      return;
+      if (!email || !isRequiredPassword(password)) {
+        sendError(res, 400, "Email and password are mandatory");
+        return;
+      }
+
+      const existAdmin = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      if (!existAdmin || existAdmin.role !== ROLES.ADMIN) {
+        sendError(res, 401, "Invalid email or password");
+        return;
+      }
+
+      const isMatch = await bcrypt.compare(password, existAdmin.password);
+
+      if (!isMatch) {
+        sendError(res, 401, "Invalid email or password");
+        return;
+      }
+
+      const token = jwt.sign(
+        {
+          id: existAdmin.id,
+          fullName: `${existAdmin.firstName} ${existAdmin.lastName}`.trim(),
+          email: existAdmin.email,
+          role: existAdmin.role,
+        },
+        JWT_SECRET,
+        {
+          expiresIn: "7d",
+        },
+      );
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      sendSuccess(res, 200, "Admin logged in successfully", { token });
+    } catch {
+      sendError(res, 500, "Internal Server Error");
     }
+  },
+);
 
-    const existAdmin = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
+router.post("/accept", (req: Request, res: Response) => {
+  try{
 
-    if (!existAdmin || existAdmin.role !== ROLES.ADMIN) {
-      sendError(res, 401, "Invalid email or password");
-      return;
-    }
-
-    const isMatch = await bcrypt.compare(password, existAdmin.password);
-
-    if (!isMatch) {
-      sendError(res, 401, "Invalid email or password");
-      return;
-    }
-
-    const token = jwt.sign(
-      {
-        id: existAdmin.id,
-        fullName: `${existAdmin.firstName} ${existAdmin.lastName}`.trim(),
-        email: existAdmin.email,
-        role: existAdmin.role,
-      },
-      JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
-    );
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    sendSuccess(res, 200, "Admin logged in successfully", { token });
-  } catch {
-    sendError(res, 500, "Internal Server Error");
+  }catch(error){
+     sendError(res, 500, "Internal Server Error");
   }
 });
 

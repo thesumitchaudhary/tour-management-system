@@ -4,6 +4,7 @@ import DashboardHeader from "@/features/dashboard/components/DashboardHeader";
 import hotelHero from "@/assets/HotelLandingPage__hero.jpg";
 import { BedDouble, Users } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Hotel = () => {
   const language = useLanguage();
@@ -114,7 +115,34 @@ const Hotel = () => {
       </section>
 
       <section>
-        <div>sumit</div>
+        <div>
+          <div>
+            <img src="" alt="" />
+          </div>
+          <div>
+            <h4> Never miss a price drop </h4>
+            <p>
+              {" "}
+              We monitor for when your hotel price drops, and notify you so you
+              can re-book.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section className="w-full">
+        <div className="w-[700px] mx-auto">
+          <h4 className="text-3xl font-bold">
+            Plan your entire trip while you’re at it
+          </h4>
+          <p>
+            Not just another hotel search — plan out your trip with us too! With
+            features like real time collaboration, importing reservations, and
+            &nbsp;
+            <Link className="text-blue-400" to={"/user/dashboard"}>
+              {t("much more.")}
+            </Link>
+          </p>
+        </div>
       </section>
       <DashboardFooter language={language} />
     </div>

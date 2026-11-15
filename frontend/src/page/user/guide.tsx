@@ -57,7 +57,7 @@ const Guide = () => {
           >
             Recent guides
           </h2>
-          <div className="grid grid-cols-3 gap-6 max-[800px]:grid-cols-2 max-[540px]:grid-cols-1">
+          <div className="grid grid-cols-4 gap-6 max-[800px]:grid-cols-2 max-[540px]:grid-cols-1">
             <article className="overflow-hidden rounded-2xl border border-[#dce5df] bg-white text-[#183d35]">
               <img
                 className="block aspect-[16/10] w-full object-cover"
@@ -84,7 +84,22 @@ const Guide = () => {
                   <MapPin size={15} aria-hidden="true" /> Guajarat, India
                 </p>
                 <h3 className="text-[19px] leading-[1.4] font-[650]">
-                  Explore Pushkar and its lakeside charm
+                  Explore Girnar and its lakeside charm
+                </h3>
+              </div>
+            </article>
+            <article className="overflow-hidden rounded-2xl border border-[#dce5df] bg-white text-[#183d35]">
+              <img
+                className="block aspect-[16/10] w-full object-cover"
+                src={tajMahal}
+                alt="Pushkar Lake in Rajasthan"
+              />
+              <div className="p-5">
+                <p className="mb-2.5 flex items-center gap-[5px] text-[13px] text-[#60756a]">
+                  <MapPin size={15} aria-hidden="true" /> Uttar Pradesh, India
+                </p>
+                <h3 className="text-[19px] leading-[1.4] font-[650]">
+                  Explore Taj Mahal and its lakeside charm
                 </h3>
               </div>
             </article>
@@ -99,7 +114,67 @@ const Guide = () => {
                   <MapPin size={15} aria-hidden="true" /> Rajasthan, India
                 </p>
                 <h3 className="text-[19px] leading-[1.4] font-[650]">
-                  Explore Pushkar and its lakeside charm
+                  Explore Taj Mahal and its lakeside charm
+                </h3>
+              </div>
+            </article>
+            <article className="overflow-hidden rounded-2xl border border-[#dce5df] bg-white text-[#183d35]">
+              <img
+                className="block aspect-[16/10] w-full object-cover"
+                src={tajMahal}
+                alt="Pushkar Lake in Rajasthan"
+              />
+              <div className="p-5">
+                <p className="mb-2.5 flex items-center gap-[5px] text-[13px] text-[#60756a]">
+                  <MapPin size={15} aria-hidden="true" /> Rajasthan, India
+                </p>
+                <h3 className="text-[19px] leading-[1.4] font-[650]">
+                  Explore Taj Mahal and its lakeside charm
+                </h3>
+              </div>
+            </article>
+            <article className="overflow-hidden rounded-2xl border border-[#dce5df] bg-white text-[#183d35]">
+              <img
+                className="block aspect-[16/10] w-full object-cover"
+                src={tajMahal}
+                alt="Pushkar Lake in Rajasthan"
+              />
+              <div className="p-5">
+                <p className="mb-2.5 flex items-center gap-[5px] text-[13px] text-[#60756a]">
+                  <MapPin size={15} aria-hidden="true" /> Rajasthan, India
+                </p>
+                <h3 className="text-[19px] leading-[1.4] font-[650]">
+                  Explore Taj Mahal and its lakeside charm
+                </h3>
+              </div>
+            </article>
+            <article className="overflow-hidden rounded-2xl border border-[#dce5df] bg-white text-[#183d35]">
+              <img
+                className="block aspect-[16/10] w-full object-cover"
+                src={tajMahal}
+                alt="Pushkar Lake in Rajasthan"
+              />
+              <div className="p-5">
+                <p className="mb-2.5 flex items-center gap-[5px] text-[13px] text-[#60756a]">
+                  <MapPin size={15} aria-hidden="true" /> Rajasthan, India
+                </p>
+                <h3 className="text-[19px] leading-[1.4] font-[650]">
+                  Explore Taj Mahal and its lakeside charm
+                </h3>
+              </div>
+            </article>
+            <article className="overflow-hidden rounded-2xl border border-[#dce5df] bg-white text-[#183d35]">
+              <img
+                className="block aspect-[16/10] w-full object-cover"
+                src={tajMahal}
+                alt="Pushkar Lake in Rajasthan"
+              />
+              <div className="p-5">
+                <p className="mb-2.5 flex items-center gap-[5px] text-[13px] text-[#60756a]">
+                  <MapPin size={15} aria-hidden="true" /> Rajasthan, India
+                </p>
+                <h3 className="text-[19px] leading-[1.4] font-[650]">
+                  Explore Taj Mahal and its lakeside charm
                 </h3>
               </div>
             </article>

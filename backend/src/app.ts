@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import travellerRouter from "./router/travellerRouter.js";
+import hotelRouter from "./router/hotelRouter.js";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/traveller", travellerRouter);
+app.use("/api/hotels", hotelRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
