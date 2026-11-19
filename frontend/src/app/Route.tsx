@@ -3,6 +3,7 @@ import HomePage from "@/features/home/pages/HomePage";
 import UserDashboard from "@/page/user/userDashboard";
 import TravelGuide from "@/page/user/guide";
 import Hotel from "@/page/user/hotel";
+import HotelMap from "@/page/user/HotelMap";
 
 const Allroute = () => {
   return (
@@ -13,6 +14,7 @@ const Allroute = () => {
           <Route path="/user/dashboard" element={<UserDashboard />} />
           <Route path="/user/guide" element={<TravelGuide />} />
           <Route path="/user/hotel" element={<Hotel />} />
+          <Route path="/user/hotel/map" element={<HotelMap />} />
         </Routes>
       </BrowserRouter>
     </>

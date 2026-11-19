@@ -4,13 +4,31 @@ import DashboardHeader from "@/features/dashboard/components/DashboardHeader";
 import hotelHero from "@/assets/HotelLandingPage__hero.jpg";
 import { BedDouble, Users } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import type { FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Hotel = () => {
   const language = useLanguage();
   const { t } = language;
+  const [place, setPlace] = useState("");
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
+
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+
+  const handleRequest = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    if (!place.trim() || (checkOut && (!checkIn || checkOut <= checkIn))) {
+      setError("Enter a city in India. If using check-out, select an earlier check-in date.");
+      return;
+    }
+    const params = new URLSearchParams({ destination: place.trim() });
+    if (checkIn) params.set("checkIn", checkIn);
+    if (checkOut) params.set("checkOut", checkOut);
+    navigate(`/user/hotel/map?${params.toString()}`);
+  };
   return (
     <div className="min-h-screen bg-background text-foreground">
       <section className="relative isolate flex min-h-[max(620px,100svh)] flex-col bg-slate-900 text-white">
@@ -32,16 +50,17 @@ const Hotel = () => {
             lodging, with your preferences as the highest priority.
           </p>
           <form
-            action="/user/hotel"
-            method="get"
+            onSubmit={handleRequest}
             className="mx-auto mt-12 grid w-full max-w-[920px] gap-2 text-left text-slate-700 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1.5fr)_auto_auto]"
           >
             <label className="flex min-w-0 flex-col justify-center rounded-lg bg-gray-100 px-4 py-2.5 focus-within:ring-2 focus-within:ring-orange-400">
               <span className="text-xs font-bold">Where</span>
               <input
                 name="destination"
+                value={place}
+                onChange={(e) => setPlace(e.target.value)}
                 required
-                placeholder="Search destinations"
+                placeholder="Search any city in India"
                 className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-400"
               />
             </label>
@@ -53,7 +72,6 @@ const Hotel = () => {
                   aria-label="Check-in date"
                   name="checkIn"
                   type="date"
-                  required
                   value={checkIn}
                   onChange={(event) => {
                     setCheckIn(event.target.value);
@@ -66,7 +84,6 @@ const Hotel = () => {
                   aria-label="Check-out date"
                   name="checkOut"
                   type="date"
-                  required
                   min={checkIn || undefined}
                   value={checkOut}
                   onChange={(event) => setCheckOut(event.target.value)}
@@ -107,6 +124,7 @@ const Hotel = () => {
               Search
             </button>
           </form>
+          {error && <p role="alert" className="mt-4 rounded-lg bg-white p-3 text-red-700">{error}</p>}
           <p className="mt-5 text-sm text-white/90">
             Already booked?{" "}
             <span className="ml-2 font-bold">Manage your bookings</span>
@@ -144,6 +162,10 @@ const Hotel = () => {
           </p>
         </div>
       </section>
+
+      {/* <section>
+        <Places />
+      </section> */}
       <DashboardFooter language={language} />
     </div>
   );
