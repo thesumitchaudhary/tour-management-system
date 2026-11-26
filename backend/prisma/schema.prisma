@@ -43,6 +43,20 @@ enum SEAT_STATUS {
   EXPIRED
 }
 
+enum HotelStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum RoomType {
+  STANDARD
+  DELUXE
+  SUPER_DELUXE
+  SUITE
+  FAMILY
+}
+
 model User {
   id        String @id @default(uuid()) @db.Uuid
   firstName String
@@ -63,6 +77,7 @@ model User {
   tourBookings  TourBooking[]  @relation("TravellerTourBookings")
   busBookings   BusBooking[]   @relation("TravellerBusBookings")
   hotelBookings HotelBooking[] @relation("TravellerHotelBookings")
+  hotelReviews  HotelReview[]
 }
 
 model Tourplace {
@@ -145,38 +160,52 @@ model BusBooking {
 }
 
 model Hotel {
-  id String @id @default(uuid()) @db.Uuid
-
+  id          String  @id @default(uuid()) @db.Uuid
+  osmId       String  @unique
   name        String
-  address     String
   description String?
+  website     String?
+  phone       String?
+
+  address String?
+  city    String
+  state   String
+  country String  @default("India")
 
   latitude  Decimal? @db.Decimal(10, 7)
   longitude Decimal? @db.Decimal(10, 7)
 
-  rooms HotelRoom[]
+  status HotelStatus @default(PENDING)
+
+  rooms   HotelRoom[]
+  reviews HotelReview[]
 
   created_At DateTime @default(now())
   updated_At DateTime @updatedAt
+
+  @@index([city, state])
+  @@index([status])
 }
 
 model HotelRoom {
-  id String @id @default(uuid()) @db.Uuid
-
+  id      String @id @default(uuid()) @db.Uuid
   hotelId String @db.Uuid
-  hotel   Hotel  @relation(fields: [hotelId], references: [id])
 
-  roomNumber String
-  roomType   String
+  roomType   RoomType
+  roomName   String
+  capacity   Int
+  totalRooms Int
+  amenities  String[]
 
-  pricePerNight Decimal @db.Decimal(10, 2)
-
+  hotel    Hotel          @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  prices   HotelPrice[]
   bookings HotelBooking[]
 
   created_At DateTime @default(now())
   updated_At DateTime @updatedAt
 
-  @@unique([hotelId, roomNumber])
+  @@unique([hotelId, roomType])
+  @@index([hotelId])
 }
 
 model HotelBooking {
@@ -194,11 +223,55 @@ model HotelBooking {
   checkIn        DateTime
   checkOut       DateTime
   numberOfGuests Int
-  totalAmount    Decimal  @db.Decimal(10, 2)
+  numberOfRooms  Int      @default(1)
+
+  totalAmount Decimal @db.Decimal(10, 2)
+  currency    String  @default("INR")
 
   status        BOOKING_STATUS @default(PENDING)
   paymentStatus PAYMENT_STATUS @default(PENDING)
 
   created_At DateTime @default(now())
   updated_At DateTime @updatedAt
+
+  @@index([roomId, checkIn, checkOut])
+  @@index([travellerId])
+}
+
+model HotelPrice {
+  id     String @id @default(uuid()) @db.Uuid
+  roomId String @db.Uuid
+
+  pricePerNight Decimal @db.Decimal(10, 2)
+  currency      String  @default("INR")
+
+  validFrom DateTime
+  validTo   DateTime
+
+  room HotelRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+
+  @@index([roomId, validFrom, validTo])
+}
+
+model HotelReview {
+  id      String @id @default(uuid()) @db.Uuid
+  hotelId String @db.Uuid
+  userId  String @db.Uuid
+
+  rating  Int
+  comment String?
+
+  hotel Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
+
+  @@unique([hotelId, userId])
+  @@index([hotelId])
+  @@index([userId])
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState, type MouseEvent } from "react";
 import { X } from "lucide-react";
-import SigninForm from "./SigninForm";
+import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
 import VerifyOtpForm from "./VerifyOtpForm";
 import type { AuthMode } from "../types/auth.types";
@@ -114,7 +114,7 @@ const AuthModal = ({ defaultMode = "signin", onClose }: AuthModalProps) => {
             setVerificationEmail(null);
             setMode("signin");
           }} />
-        ) : mode === "signup" ? <SignupForm onRegistered={setVerificationEmail} /> : <SigninForm />}
+        ) : mode === "signup" ? <SignupForm onRegistered={setVerificationEmail} /> : <LoginForm />}
       </div>
     </div>
   );

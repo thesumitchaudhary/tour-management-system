@@ -1,4 +1,4 @@
-import api from "@/lib/api";
+import api from "@/services/apiClient";
 
 type AuthResponse = { success: boolean; message: string };
 

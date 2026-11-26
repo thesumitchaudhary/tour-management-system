@@ -1,12 +1,3 @@
-import "../App.css";
-import Allroute from "../app/Route";
-
-function App() {
-  return (
-    <>
-      <Allroute />
-    </>
-  );
-}
-
-export default App;
+import "@/styles/App.css";
+import AppRouter from "@/router/AppRouter";
+export default function App() { return <AppRouter />; }

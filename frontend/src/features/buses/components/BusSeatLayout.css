@@ -1,0 +1,89 @@
+
+.bus-container {
+  max-width: 350px;
+  margin: 20px auto;
+  padding: 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.bus-svg {
+  width: 100%;
+  max-width: 220px;
+}
+
+.bus-body {
+  fill: none;
+  stroke: #999;
+  stroke-width: 1.5;
+}
+
+.seat {
+  outline: none;
+}
+
+.seat rect {
+  stroke: #999;
+  stroke-width: 1;
+  transition: fill 0.15s;
+}
+
+.available {
+  fill: #e3e4e6;
+}
+
+.available:hover {
+  fill: #b5d5ff;
+}
+
+.selected {
+  fill: #22a06b;
+  stroke: #168452;
+}
+
+.booked {
+  fill: #e88b8b;
+  cursor: not-allowed;
+}
+
+.seat:focus-visible rect {
+  stroke: #1769aa;
+  stroke-width: 2.5;
+}
+
+.seat-text {
+  font-size: 8px;
+  fill: #333;
+  text-anchor: middle;
+  pointer-events: none;
+  user-select: none;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  margin: 15px 0;
+}
+
+.selected-info {
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.selected-info button {
+  padding: 10px 20px;
+  background: #168452;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.selected-info button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

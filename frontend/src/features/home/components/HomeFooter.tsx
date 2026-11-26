@@ -1,4 +1,4 @@
-import LanguageSelector from "@/components/LanguageSelector";
+import LanguageSelector from "@/components/common/LanguageSelector";
 import { Globe2 } from "lucide-react";
 import { indianStateLanguages } from "@/i18n/stateLanguages";
 import { footerLinks } from "../data/footer.data";

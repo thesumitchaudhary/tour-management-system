@@ -1,7 +1,7 @@
 import { type FormEvent } from "react";
 import { signUp } from "../api/auth.api";
 import { useAuth } from "../hooks/useAuth";
-import GlobeLoader from "@/components/GlobeLoader";
+import GlobeLoader from "@/components/common/GlobeLoader";
 
 const fieldClassName =
   "h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/30";

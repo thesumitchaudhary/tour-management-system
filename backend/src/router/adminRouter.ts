@@ -97,10 +97,12 @@ router.post<EmptyParams, AdminLoginResponse, AdminLoginBody>(
 );
 
 router.post("/accept", (req: Request, res: Response) => {
-  try{
+  try {
+    const { accept } = req.body;
 
-  }catch(error){
-     sendError(res, 500, "Internal Server Error");
+    
+  } catch (error) {
+    sendError(res, 500, "Internal Server Error");
   }
 });
 

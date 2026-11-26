@@ -1,8 +1,8 @@
 ﻿import { useEffect, useState, type FormEvent } from "react";
 import { isAxiosError } from "axios";
 import { useMutation } from "@tanstack/react-query";
-import api from "@/lib/api";
-import SigninForm from "@/features/auth/components/SigninForm";
+import api from "@/services/apiClient";
+import LoginForm from "@/features/auth/components/LoginForm";
 
 type Profile = { firstName: string; lastName: string; email: string };
 type ProfileResponse = { success: boolean; message: string; data: Profile };
@@ -86,7 +86,7 @@ export default function ProfileForm() {
   }
 
   if (loading) return <p role="status" className="mt-5 text-sm">Loading profile...</p>;
-  if (needsLogin) return <div className="mt-5"><p className="mb-4 text-sm text-muted-foreground">Sign in to view and change your profile.</p><SigninForm onSuccess={() => void loadProfile()} /></div>;
+  if (needsLogin) return <div className="mt-5"><p className="mb-4 text-sm text-muted-foreground">Sign in to view and change your profile.</p><LoginForm onSuccess={() => void loadProfile()} /></div>;
 
   return <div className="mt-5">
     {profile && <form onSubmit={saveProfile} className="space-y-4">

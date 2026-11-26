@@ -1,4 +1,4 @@
-import LanguageSelector from "@/components/LanguageSelector";
+import LanguageSelector from "@/components/common/LanguageSelector";
 import type { useLanguage } from "@/hooks/useLanguage";
 
 const DashboardFooter = ({
